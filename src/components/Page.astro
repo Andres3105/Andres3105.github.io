@@ -1,0 +1,230 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Stamp from './Stamp.astro';
+import { site } from '../data/site';
+import { ui, projects, jobs, education, skills, type Lang, type Project } from '../data/content';
+import { getRepos } from '../lib/github';
+import { withBase } from '../lib/paths';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const other: Lang = lang === 'es' ? 'en' : 'es';
+const otherHref = withBase(other === 'es' ? '/' : '/en/');
+
+const repos = await getRepos();
+const fmt = new Intl.DateTimeFormat(lang === 'es' ? 'es-CO' : 'en-US', { month: 'short', year: 'numeric' });
+
+const enrich = (p: Project) => {
+  const live = repos.get(p.repo.toLowerCase());
+  return {
+    ...p,
+    url: `https://github.com/${site.github}/${p.repo}`,
+    language: live?.language ?? p.fallback.language,
+    updated: fmt.format(new Date(live?.pushed ?? `${p.fallback.pushed}T12:00:00Z`)),
+    homepage: live?.homepage ?? null,
+  };
+};
+
+const pair = projects.filter((p) => p.group === 'store').map(enrich);
+const rest = projects.filter((p) => p.group !== 'store').map(enrich);
+
+const cvHref = site.cv[lang] || site.cv.es;
+const cvLabel = t.ctaCv + (site.cv[lang] ? '' : t.cvSpanish);
+const githubUrl = `https://github.com/${site.github}`;
+// El nombre se parte en dos líneas: nombres / apellidos.
+const words = site.name.split(' ');
+const nameLines = [words.slice(0, 2).join(' '), words.slice(2).join(' ')].filter(Boolean);
+---
+
+<Layout lang={lang}>
+  <header class="wrap top">
+    <a class="brand" href={withBase(lang === 'es' ? '/' : '/en/')}>{site.shortName}</a>
+    <nav aria-label={lang === 'es' ? 'Secciones' : 'Sections'}>
+      <ul>
+        <li><a href="#proyectos">{t.nav.projects}</a></li>
+        <li><a href="#experiencia">{t.nav.experience}</a></li>
+        <li><a href="#formacion">{t.nav.education}</a></li>
+        <li><a href="#habilidades">{t.nav.skills}</a></li>
+        <li><a href="#contacto">{t.nav.contact}</a></li>
+      </ul>
+    </nav>
+    <div class="tools">
+      <a class="lang" href={otherHref} hreflang={other} lang={other} aria-label={t.switchLabel}>{t.switchTo}</a>
+      <button class="theme" type="button" aria-label={t.theme} title={t.theme}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M12 2.5a9.5 9.5 0 0 1 0 19z" fill="currentColor"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="wrap hero">
+      <div class="hero-text">
+        <h1>{nameLines.map((l) => <span>{l}</span>)}</h1>
+        <p class="role">{t.role}</p>
+        <p class="summary">{t.summary}</p>
+        <div class="actions">
+          <a class="btn primary" href="#proyectos">{t.ctaProjects}</a>
+          {cvHref && (
+            <a class="btn ghost" href={withBase(cvHref)} download>
+              {cvLabel}
+            </a>
+          )}
+        </div>
+      </div>
+      <Stamp ring={t.stampRing} />
+    </section>
+
+    <div class="wrap">
+      <section class="section" id="proyectos" aria-labelledby="h-proyectos">
+        <h2 id="h-proyectos">{t.projectsTitle}</h2>
+        <div class="section-body">
+          <p class="lead">{t.projectsIntro}</p>
+
+          {
+            pair.length > 0 && (
+              <div class="pair">
+                <h3>{t.pairTitle}</h3>
+                <p>{t.pairText}</p>
+                <div class="pair-grid">
+                  {pair.map((p) => (
+                    <article class="project">
+                      {p.variant && <p class="variant">{p.variant[lang]}</p>}
+                      <h4>{p.title[lang]}</h4>
+                      <p>{p.desc[lang]}</p>
+                      <ul class="stack" aria-label="Stack">
+                        {p.stack.map((s) => (
+                          <li>{s}</li>
+                        ))}
+                      </ul>
+                      <p class="meta">
+                        <span>
+                          {t.updated} {p.updated}
+                        </span>
+                        <a href={p.url}>{t.viewCode}</a>
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <div class="list">
+            {
+              rest.map((p) => (
+                <article class="project">
+                  <h3>{p.title[lang]}</h3>
+                  <p>{p.desc[lang]}</p>
+                  <ul class="stack" aria-label="Stack">
+                    {p.stack.map((s) => (
+                      <li>{s}</li>
+                    ))}
+                  </ul>
+                  <p class="meta">
+                    <span>
+                      {t.updated} {p.updated}
+                    </span>
+                    {p.homepage && <a href={p.homepage}>Demo</a>}
+                    <a href={p.url}>{t.viewCode}</a>
+                  </p>
+                </article>
+              ))
+            }
+          </div>
+          <a class="more" href={`${githubUrl}?tab=repositories`}>{t.moreOnGithub}</a>
+        </div>
+      </section>
+
+      <section class="section" id="experiencia" aria-labelledby="h-experiencia">
+        <h2 id="h-experiencia">{t.experienceTitle}</h2>
+        <ol class="section-body timeline">
+          {
+            jobs.map((j) => (
+              <li>
+                <p class="period">{j.period[lang]}</p>
+                <div>
+                  <h3>{j.role[lang]}</h3>
+                  <p class="company">{j.company}</p>
+                  <ul class="points">
+                    {j.points.map((pt) => (
+                      <li>{pt[lang]}</li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="section" id="formacion" aria-labelledby="h-formacion">
+        <h2 id="h-formacion">{t.educationTitle}</h2>
+        <ul class="section-body edu">
+          {
+            education.map((e) => (
+              <li>
+                <h3>{e.title[lang]}</h3>
+                <p>
+                  {e.place[lang]}, {e.when[lang]}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="section" id="habilidades" aria-labelledby="h-habilidades">
+        <h2 id="h-habilidades">{t.skillsTitle}</h2>
+        <dl class="section-body skills">
+          {
+            skills.map((s) => (
+              <>
+                <dt>{s.label[lang]}</dt>
+                <dd>{s.items[lang]}</dd>
+              </>
+            ))
+          }
+        </dl>
+      </section>
+
+      <section class="section" id="contacto" aria-labelledby="h-contacto">
+        <h2 id="h-contacto">{t.contactTitle}</h2>
+        <div class="section-body">
+          <p class="contact-text">{t.contactText}</p>
+          {site.email && (
+            <a class="email" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+          )}
+          <div class="links">
+            {site.linkedin && (
+              <a class="btn primary" href={site.linkedin}>
+                LinkedIn
+              </a>
+            )}
+            <a class={site.linkedin ? 'btn ghost' : 'btn primary'} href={githubUrl}>
+              GitHub
+            </a>
+            {cvHref && (
+              <a class="btn ghost" href={withBase(cvHref)} download>
+                {cvLabel}
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap foot">
+    <span>{site.name}</span>
+    <span>{t.footer}, {new Date().getFullYear()}</span>
+  </footer>
+</Layout>
