@@ -15,8 +15,8 @@ export const site = {
   github: 'Andres3105',
 
   // ── Contacto (rellena lo que quieras publicar) ──────────────
-  email: '', // ej: 'tucorreo@gmail.com'
-  linkedin: '', // ej: 'https://www.linkedin.com/in/tu-usuario/'
+  email: 'andresbohorquezc05@gmail.com', // ej: 'tucorreo@gmail.com'
+  linkedin: 'www.linkedin.com/in/andresbohorquez5', // ej: 'https://www.linkedin.com/in/tu-usuario/'
 
   // ── Foto opcional ───────────────────────────────────────────
   // Pon la imagen en la carpeta /public y escribe su ruta, ej: '/foto.webp'
@@ -25,7 +25,7 @@ export const site = {
 
   // ── Hoja de vida en PDF (carpeta /public/cv) ────────────────
   cv: {
-    es: '/cv/Andres-Bohorquez-CV-es.pdf',
-    en: '', // ej: '/cv/Andres-Bohorquez-CV-en.pdf'
+    es: '/cv/CV_Andres_Bohorquez_Es.pdf',
+    en: '/cv/CV_Andres_Bohorquez_En', // ej: '/cv/Andres-Bohorquez-CV-en.pdf'
   },
 };
