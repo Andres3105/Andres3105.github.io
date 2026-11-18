@@ -16,7 +16,7 @@ export const site = {
 
   // ── Contacto (rellena lo que quieras publicar) ──────────────
   email: 'andresbohorquezc05@gmail.com', // ej: 'tucorreo@gmail.com'
-  linkedin: 'www.linkedin.com/in/andresbohorquez5', // ej: 'https://www.linkedin.com/in/tu-usuario/'
+  linkedin: 'https://www.linkedin.com/in/andresbohorquez5', // ej: 'https://www.linkedin.com/in/tu-usuario/'
 
   // ── Foto opcional ───────────────────────────────────────────
   // Pon la imagen en la carpeta /public y escribe su ruta, ej: '/foto.webp'
