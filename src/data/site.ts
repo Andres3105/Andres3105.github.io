@@ -26,6 +26,6 @@ export const site = {
   // ── Hoja de vida en PDF (carpeta /public/cv) ────────────────
   cv: {
     es: '/cv/CV_Andres_Bohorquez_Es.pdf',
-    en: '/cv/CV_Andres_Bohorquez_En', // ej: '/cv/Andres-Bohorquez-CV-en.pdf'
+    en: '/cv/CV_Andres_Bohorquez_En.pdf', // ej: '/cv/Andres-Bohorquez-CV-en.pdf'
   },
 };
